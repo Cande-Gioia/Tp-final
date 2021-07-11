@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   main.c
- * Author: cande
- *
- * Created on 9 de julio de 2021, 08:08
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro5/allegro5.h>
@@ -19,191 +6,150 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
-#include <allegro5/allegro_color.h> // NO OLVIDAR AGREGAR EN EL LINKER DEL PROYECTO
-#define HEIGHT 480
-#define WIDTH 480
-#define MOVE_RATE  30.0
-enum MYKEYS {
-    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT //arrow keys
-};
-/*
- * 
- */
+#include <allegro5/allegro_color.h> 
+#include "info.h"
+#define FPS 5.0
+
+auto_t autoo;
+rana_t rana = { WIDTH/2 -RANA_W/2,HEIGHT,3 };
+ALLEGRO_BITMAP *autobit= NULL;    
+void init (ALLEGRO_DISPLAY *display);
+void landscape (void);
+void init_car(ALLEGRO_DISPLAY *display);
 int main(void) 
 {
-    float rana_x = 240.0;
-    float rana_y= 450.0;
-    ALLEGRO_DISPLAY * display = NULL;  //Crea en puntero al display 
-    ALLEGRO_BITMAP *cuadradito = NULL;
-    ALLEGRO_BITMAP *rana= NULL;
-    ALLEGRO_TIMER *timer = NULL;
+
+
+    ALLEGRO_DISPLAY *display = NULL;  //Crea en puntero al display 
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-    bool key_pressed[4] = {false, false, false, false}; //Estado de teclas, true cuando esta apretada
-    bool redraw = false;
+    ALLEGRO_TIMER *timer = NULL;
     bool do_exit = false;
-    if (!al_init()) { //Primera funcion a llamar antes de empezar a usar allegro.
-        fprintf(stderr, "failed to initialize allegro!\n");
-        return -1;
-    }
-        if (!al_install_keyboard()) {
-        fprintf(stderr, "failed to initialize the keyboard!\n");
-        return -1;
+    autoo.pos_x = 90.0;
+       autoo.pos_y = FILA_H;
+
+    if (!al_init()) {
+        printf( "failed to initialize allegro!\n");
     }
 
-    if (!al_init_primitives_addon()) {
-        fprintf(stderr, "failed to initialize primitives!\n");
-        return -1;
-    }
-    display = al_create_display(480, 480);
-    if (!display) {
-        fprintf(stderr, "failed to create display!\n");
-        return -1;
-    }
-        cuadradito = al_create_bitmap(50, 30);
-        rana = al_create_bitmap(30,30);
-    if (!cuadradito) {
-        fprintf(stderr, "failed to create cuadradito bitmap!\n");
-        al_destroy_timer(timer);
-        return -1;
-    }
-        
-    timer = al_create_timer(1.0 / 5.0);
+    timer = al_create_timer(1.0 / FPS);
     if (!timer) {
-        fprintf(stderr, "failed to create timer!\n");
-        return -1;
+        printf("failed to create timer!\n");
+      
     }
+    
     
     event_queue = al_create_event_queue();
     if (!event_queue) {
-        fprintf(stderr, "failed to create event_queue!\n");
-        al_destroy_bitmap(cuadradito);
+        printf("failed to create event_queue!\n");
         al_destroy_timer(timer);
-        return -1;
-    }
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-    al_register_event_source(event_queue, al_get_timer_event_source(timer));
-    al_register_event_source(event_queue, al_get_keyboard_event_source()); //REGISTRAMOS EL TECLADO
-    
-    
-    
-    
-    
-    al_start_timer(timer);
-    
-       
 
+    }
     
+
+
+    display = al_create_display(HEIGHT, WIDTH); // Intenta crear display de 640x480 de fallar devuelve NULL
+    if (!display) {
+        printf( "failed to create display!\n");
+
+    }
+    if (!al_init_primitives_addon()) {
+        printf( "failed to initialize primitives!\n");
+    }
+  
  
-   
-    al_draw_filled_rectangle(0, 480/2, 480 , 480, al_color_name("black"));
-    al_draw_filled_rectangle(0, 450, 480 , 480, al_color_name("purple"));
-    al_draw_filled_rectangle(0, 480/2 -30, 480 , 480/2, al_color_name("purple"));
-    al_draw_filled_rectangle(0, 0, 480 , 480/2-30, al_color_name("blue"));
-    al_draw_filled_rectangle(0, 0, 480 , 30, al_color_name("green"));
-    al_set_target_bitmap(cuadradito);
-    al_clear_to_color(al_map_rgb(255, 255, 255));
-    al_set_target_bitmap(al_get_backbuffer(display));
-    al_draw_bitmap(cuadradito, 200, 400, 0);
-    al_set_target_bitmap(rana);
-    al_clear_to_color(al_map_rgb(255, 255, 0));
-    al_set_target_bitmap(al_get_backbuffer(display));
-    al_flip_display();
 
-
-
+   al_register_event_source(event_queue, al_get_timer_event_source(timer));
+   al_register_event_source(event_queue, al_get_display_event_source(display));
     
-    while (!do_exit) {
-        ALLEGRO_EVENT ev;
-        if (al_get_next_event(event_queue, &ev)) //Toma un evento de la cola, VER RETURN EN DOCUMENT.
-        {
-            if (ev.type == ALLEGRO_EVENT_TIMER) {
-                if (key_pressed[KEY_UP] && rana_y >= MOVE_RATE)
-                    rana_y -= MOVE_RATE;
+   init(display);
+   al_flip_display();
+   al_start_timer(timer);
+                
 
-                if (key_pressed[KEY_DOWN] && rana_y<= 480.0 - 30.0 - MOVE_RATE)
-                   rana_y += MOVE_RATE;
+    while (!do_exit) 
+    {
+      ALLEGRO_EVENT ev;
+      if (al_get_next_event(event_queue, &ev)) //Toma un evento de la cola, VER RETURN EN DOCUMENT.
+      {
+          if (ev.type == ALLEGRO_EVENT_TIMER) {
+              if(autoo.pos_x >= WIDTH)
+              {
+                  
+                  autoo.pos_x= -300.0;
+                  
+              }
+              else
+              {
+                autoo.pos_x = autoo.pos_x + 30.0;
+              }
 
-                if (key_pressed[KEY_LEFT] && rana_x >= MOVE_RATE)
-                    rana_x -= MOVE_RATE;
+          }
+          else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+              do_exit = true;
+      }
+          if (al_is_event_queue_empty(event_queue)) {
+     
+          init(display);
+          al_flip_display();
+        } 
 
-                if (key_pressed[KEY_RIGHT] && rana_x<= 480.0 -30.0  - MOVE_RATE)
-                   rana_x += MOVE_RATE;
-
-                redraw = true;
-            }
-            else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-                do_exit = true;
-
-            else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-                switch (ev.keyboard.keycode) {
-                    case ALLEGRO_KEY_UP:
-                        key_pressed[KEY_UP] = true;
-                        break;
-
-                    case ALLEGRO_KEY_DOWN:
-                        key_pressed[KEY_DOWN] = true;
-                        break;
-
-                    case ALLEGRO_KEY_LEFT:
-                        key_pressed[KEY_LEFT] = true;
-                        break;
-
-                    case ALLEGRO_KEY_RIGHT:
-                        key_pressed[KEY_RIGHT] = true;
-                        break;
-                }
-            }
-            else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
-                switch (ev.keyboard.keycode) {
-                    case ALLEGRO_KEY_UP:
-                        key_pressed[KEY_UP] = false;
-                        break;
-
-                    case ALLEGRO_KEY_DOWN:
-                        key_pressed[KEY_DOWN] = false;
-                        break;
-
-                    case ALLEGRO_KEY_LEFT:
-                        key_pressed[KEY_LEFT] = false;
-                        break;
-
-                    case ALLEGRO_KEY_RIGHT:
-                        key_pressed[KEY_RIGHT] = false;
-                        break;
-
-                    case ALLEGRO_KEY_ESCAPE:
-                        do_exit = true;
-                        break;
-                }
-            }
-        }
-
-        if (redraw && al_is_event_queue_empty(event_queue)) {
-            redraw = false;
-              
-            al_draw_filled_rectangle(0, 480/2, 480 , 480, al_color_name("black"));
-            al_draw_filled_rectangle(0, 450, 480 , 480, al_color_name("purple"));
-            al_draw_filled_rectangle(0, 480/2 -30, 480 , 480/2, al_color_name("purple"));
-            al_draw_filled_rectangle(0, 0, 480 , 480/2-30, al_color_name("blue"));
-            al_draw_filled_rectangle(0, 0, 480 , 30, al_color_name("green"));
-              al_draw_bitmap(cuadradito, 200, 400, 0);
-            al_draw_bitmap(rana, rana_x, rana_y, 0);
-            al_flip_display();
-        }
+      
     }
     
+      
+       al_destroy_event_queue(event_queue);  
+   al_destroy_display(display); 
     
-    al_destroy_bitmap(rana);
-    al_destroy_bitmap(cuadradito);
-    al_destroy_timer(timer);
+   return 0; 
+}
+void init (ALLEGRO_DISPLAY *display)
+{
+    ALLEGRO_BITMAP *ranabit= NULL; 
+    rana.pointer = ranabit;
 
-    al_destroy_display(display); //IMPORTANTE: Destruir recursor empleados
+    ranabit = al_create_bitmap(RANA_W,RANA_W);
+    if (!ranabit) {
+        printf("failed to create cuadradito bitmap!\n");
+    }
+    landscape();
+     init_car(display); 
     
-    return 0;
+
+    al_set_target_bitmap(ranabit);
+    al_clear_to_color(al_map_rgb(0, 255, 0));  //Agua
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_draw_bitmap(ranabit,  WIDTH/2 -RANA_W/2,HEIGHT-RANA_H, 0);   
     
     
+}
+void landscape(void)
+
+{
+    al_draw_filled_rectangle(0, RANA_H , WIDTH , HEIGHT/2-RANA_H, al_color_name("blue"));
+    al_draw_filled_rectangle(0, HEIGHT/2, WIDTH, HEIGHT, al_color_name("black"));  //Calle 
+    al_draw_filled_rectangle(0, HEIGHT - 30 , WIDTH , WIDTH, al_color_name("purple"));
+    al_draw_filled_rectangle(0, HEIGHT/2 -30, WIDTH , WIDTH/2, al_color_name("purple"));
+
+}
+
+void init_car(ALLEGRO_DISPLAY *display)
+{
+
+    autoo.pointer = autobit;
+     
+     
+    autobit = al_create_bitmap(RANA_W*2,RANA_H);
+    if (!autobit) {
+        printf("failed to create cuadradito bitmap!\n");
+    }
+    al_set_target_bitmap(autobit);
+    al_clear_to_color(al_map_rgb(255, 255, 255));  //Agua
+    al_set_target_bitmap(al_get_backbuffer(display));
+    al_draw_bitmap(autobit, autoo.pos_x,autoo.pos_y, 0);   
     
     
 }
 
-//            al_draw_bitmap(cuadradito,240, 400, 0);
+
+    
+        
