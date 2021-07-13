@@ -1,33 +1,34 @@
+
+
 /***************************************************************************//**
   @file     +Nombre del archivo (ej: template.h)+
   @brief    +Descripcion del archivo+
   @author   +Nombre del autor (ej: Salvador Allende)+
  ******************************************************************************/
 
-#ifndef _INFO_H_
-#define _INFO_H_
+#ifndef _ALLEGRO_H_
+#define _ALLEGRO_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_color.h> 
+#include "info.h"
+#include "rana1.h"
 
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define WIDTH 480
-#define HEIGHT 480
-#define AGUA_H 180
-#define AGUA_W 480
-#define MOVE_RATE_RANA 30.0
-#define RANA_H 30
-#define RANA_W 30
-#define FILA_H 400
-#define OBJ_H 30
-#define CANT_OBJ 20
-#define PASOS_AL 30
 
 
 /*******************************************************************************
@@ -40,13 +41,15 @@
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-
+// +ej: extern unsigned int anio_actual;+
 
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-
+ALLEGRO_BITMAP * init (ALLEGRO_DISPLAY *display,rana_t rana);
+void landscape (void);
+void init_obj(ALLEGRO_DISPLAY *display,  ALLEGRO_BITMAP *objbit, int16_t x, int16_t y, int16_t width );
 /**
  * @brief TODO: completar descripcion
  * @param param1 Descripcion parametro 1
@@ -59,4 +62,4 @@
 /*******************************************************************************
  ******************************************************************************/
 
-#endif // _INFO_H_
+#endif // _ALLEGRO_H_
