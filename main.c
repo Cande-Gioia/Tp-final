@@ -10,7 +10,7 @@
 void delay(int number_of_seconds);
 int main(void)
 {
-
+	//INICIALIZACION OBJETOS Y RANA CHEQUEADOS
 	//inicializo rana
 	rana_t rana; 
 	rana = pos_rana_init(rana, PASOS);
@@ -35,7 +35,7 @@ int main(void)
 	{
 	printf("%d --> tronco x: %d tronco y: %d tronco width: %d tronco type_obj: %d tronco speed: %d tronco original : %d\n", i, troncos[i].pos_x, troncos[i].pos_y, troncos[i].width, troncos[i].type_obj, 			troncos[i].speed, troncos[i].original_speed);
 	}*/
-	//Movimiento  rana chequeado (TODOS LOS CASOS)
+	//MOVIMIENTO RANA (TODOS LOS CASOS)
 	/*rana.pos_x = 15;
 	rana.pos_y = 15;
 	rana= movimiento_rana('U', rana, PASOS);
@@ -47,7 +47,7 @@ int main(void)
 	rana= movimiento_rana('R', rana, PASOS);
 	printf("rana x: %d\t rana y: %d\t rana colision: %d\t rana vidas: %d\n", rana.pos_x, rana.pos_y, rana.colision, rana.cant_vida);	*/
 	
-	//Movimiento objetos funciona
+	//MOVIMIENTOS OBJETOS CHEQUEADO
 	/*while (1)
 	{ 
 
@@ -57,17 +57,17 @@ int main(void)
 		}*/
 		
 		
-		//COLISIONES :  AGUA
+		//COLISIONES :  AGUA y AUTOS CHEQUEADO
 	rana.pos_x= 6;
 	rana.pos_y= 7;
 	rana = colision ( rana, PASOS, autos, troncos);
 	printf("rana x: %d\t rana y: %d\t rana colision: %d\t rana vidas: %d\n", rana.pos_x, rana.pos_y, rana.colision, rana.cant_vida);
-	//COLISIONES :  TRONCO
+	//COLISIONES :  TRONCO CHEQUEADO
 	rana.pos_x= 9;
 	rana.pos_y= 7;
 	/*rana = colision ( rana, PASOS, autos, troncos);
 	printf("rana x: %d\t rana y: %d\t rana colision: %d\t rana vidas: %d\n", rana.pos_x, rana.pos_y, rana.colision, rana.cant_vida);		*/	
-		
+	//MOVIMIENTO RANA_TRONCO CHEQUEADO	
         while (rana.cant_vida == 2)
 	{ 
 
